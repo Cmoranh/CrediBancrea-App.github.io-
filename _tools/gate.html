@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Credi Bancrea · Acceso</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230099D8'/%3E%3Cpath d='M20 44V20h14a8 8 0 0 1 0 16H20' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root { --azul:#0099D8; --navy:#242A57; --lima:#A4CD39; --gris:#757DA8; --bg:#F7FAFD; --card:#fff; --line:#DCE0EF; --ink:#242A57; --err:#CC3B3B; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#0F1320; --card:#171E31; --line:#262E47; --ink:#E6E9F4; --navy:#E6E9F4; --gris:#9AA3C4; }
+  }
+  :root[data-theme="dark"] { --bg:#0F1320; --card:#171E31; --line:#262E47; --ink:#E6E9F4; --navy:#E6E9F4; --gris:#9AA3C4; }
+  * { box-sizing:border-box; }
+  html,body { height:100%; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:Inter,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; display:grid; place-items:center; padding:24px; -webkit-font-smoothing:antialiased; }
+  .box { width:100%; max-width:380px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:30px 28px 26px; box-shadow:0 1px 2px rgba(36,42,87,.06),0 12px 32px -14px rgba(36,42,87,.2); }
+  .brand { display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+  .mark { width:36px; height:36px; border-radius:10px; background:var(--azul); display:grid; place-items:center; flex:none; }
+  .mark svg { width:20px; height:20px; }
+  .brand b { display:block; font-size:16px; letter-spacing:-.01em; color:var(--navy); }
+  .brand small { display:block; font-size:12px; color:var(--gris); margin-top:1px; }
+  h1 { font-size:18px; font-weight:600; margin:0 0 4px; color:var(--navy); letter-spacing:-.01em; }
+  p.sub { margin:0 0 20px; font-size:13.5px; color:var(--gris); }
+  label { display:block; font-size:12px; font-weight:600; color:var(--gris); letter-spacing:.04em; text-transform:uppercase; margin:0 0 6px; }
+  input { width:100%; font:inherit; font-size:15px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:10px; padding:11px 12px; margin-bottom:14px; outline:none; }
+  input:focus { border-color:var(--azul); box-shadow:0 0 0 3px rgba(0,153,216,.18); }
+  button { width:100%; font:inherit; font-weight:600; font-size:15px; color:#fff; background:var(--azul); border:0; border-radius:10px; padding:12px; cursor:pointer; margin-top:4px; }
+  button:hover { background:#0084BB; } button:disabled { opacity:.6; cursor:progress; }
+  button:focus-visible { outline:2px solid var(--navy); outline-offset:3px; }
+  .err { min-height:18px; font-size:13px; color:var(--err); margin:10px 0 0; }
+  .foot { margin-top:18px; font-size:12px; color:var(--gris); text-align:center; }
+  .hidden { display:none; }
+  .spin { text-align:center; color:var(--gris); font-size:14px; }
+</style>
+</head>
+<body>
+  <main class="box" id="box">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M20 44V20h14a8 8 0 0 1 0 16H20" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span><b>Credi Bancrea</b><small>Documentación técnica</small></span>
+    </div>
+    <div id="spin" class="spin hidden">Verificando sesión…</div>
+    <form id="f" autocomplete="off">
+      <h1>Acceso restringido</h1>
+      <p class="sub">Ingresa tus credenciales para continuar.</p>
+      <label for="u">Usuario</label>
+      <input id="u" name="u" inputmode="numeric" autocomplete="username" required>
+      <label for="p">Contraseña</label>
+      <input id="p" name="p" type="password" autocomplete="current-password" required>
+      <button id="b" type="submit">Entrar</button>
+      <div class="err" id="e" role="alert"></div>
+    </form>
+    <div class="foot">Uso interno · contenido cifrado</div>
+  </main>
+
+<script>
+(function () {
+  var USER_HASH = "{{USER_HASH}}";
+  var SALT = "{{SALT}}", IV = "{{IV}}", CT = "{{CT}}", ITER = {{ITER}};
+  var SS_KEY = "cb_k";
+  var enc = new TextEncoder(), dec = new TextDecoder();
+
+  function b64d(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+  function b64e(u) { var s = ""; for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s); }
+  function hex(buf) { return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ("0" + b.toString(16)).slice(-2); }).join(""); }
+
+  function deriveKey(pass) {
+    return crypto.subtle.importKey("raw", enc.encode(pass), "PBKDF2", false, ["deriveKey"]).then(function (km) {
+      return crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64d(SALT), iterations: ITER, hash: "SHA-256" }, km,
+        { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
+    });
+  }
+  function importRaw(rawB64) {
+    return crypto.subtle.importKey("raw", b64d(rawB64), { name: "AES-GCM" }, true, ["decrypt"]);
+  }
+  function decryptWith(key) {
+    return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64d(IV) }, key, b64d(CT)).then(function (pt) { return dec.decode(pt); });
+  }
+  function render(html) {
+    document.open(); document.write(html); document.close();
+  }
+
+  var f = document.getElementById("f"), e = document.getElementById("e"), b = document.getElementById("b"), spin = document.getElementById("spin");
+
+  // Sesión ya abierta en esta pestaña: descifra en silencio.
+  var saved = null;
+  try { saved = sessionStorage.getItem(SS_KEY); } catch (_) {}
+  if (saved) {
+    f.classList.add("hidden"); spin.classList.remove("hidden");
+    importRaw(saved).then(decryptWith).then(render).catch(function () {
+      try { sessionStorage.removeItem(SS_KEY); } catch (_) {}
+      spin.classList.add("hidden"); f.classList.remove("hidden");
+    });
+  }
+
+  f.addEventListener("submit", function (ev) {
+    ev.preventDefault(); e.textContent = ""; b.disabled = true;
+    var u = document.getElementById("u").value.trim(), p = document.getElementById("p").value;
+    crypto.subtle.digest("SHA-256", enc.encode(u)).then(function (h) {
+      if (hex(h) !== USER_HASH) throw new Error("bad");
+      return deriveKey(p);
+    }).then(function (key) {
+      return decryptWith(key).then(function (html) {
+        return crypto.subtle.exportKey("raw", key).then(function (raw) {
+          try { sessionStorage.setItem(SS_KEY, b64e(new Uint8Array(raw))); } catch (_) {}
+          render(html);
+        });
+      });
+    }).catch(function () {
+      b.disabled = false;
+      e.textContent = "Usuario o contraseña incorrectos.";
+      document.getElementById("p").value = ""; document.getElementById("p").focus();
+    });
+  });
+})();
+</script>
+</body>
+</html>
