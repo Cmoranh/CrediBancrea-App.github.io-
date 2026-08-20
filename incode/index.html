@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sesiones Incode en Bancrea</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg:#F1F4F5; --surface:#FFFFFF; --surface-2:#E8EDEF; --ink:#14181D; --muted:#58646B;
+    --line:#D5DEE1; --line-soft:#E4EAEC; --accent:#0E6A72; --accent-bg:#E0EEEF;
+    --ok:#2E6F4E; --ok-bg:#E2EFE7; --warn:#8A6410; --warn-bg:#F4EBD7; --crit:#9E3129; --crit-bg:#F6E3E1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0D1216; --surface:#151C21; --surface-2:#1D262C; --ink:#DEE5E9; --muted:#94A1A8;
+      --line:#2A353C; --line-soft:#212B31; --accent:#4BB3BA; --accent-bg:#10292C;
+      --ok:#63B183; --ok-bg:#12271B; --warn:#CB9C33; --warn-bg:#2A2110; --crit:#DC6F65; --crit-bg:#2C1614;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0D1216; --surface:#151C21; --surface-2:#1D262C; --ink:#DEE5E9; --muted:#94A1A8;
+    --line:#2A353C; --line-soft:#212B31; --accent:#4BB3BA; --accent-bg:#10292C;
+    --ok:#63B183; --ok-bg:#12271B; --warn:#CB9C33; --warn-bg:#2A2110; --crit:#DC6F65; --crit-bg:#2C1614;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Source Serif 4",Georgia,serif; font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:1180px; margin:0 auto; padding:0 28px 96px; }
+  .col { max-width:72ch; }
+  h1,h2,h3,.eyebrow,th,.chip,.stat-n,.tag,.step-t { font-family:Archivo,"Helvetica Neue",Arial,sans-serif; }
+  .eyebrow { font-size:11px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); }
+  header.masthead { border-bottom:1px solid var(--line); padding:54px 0 32px; }
+  h1 { font-size:clamp(32px,4.6vw,50px); font-weight:800; line-height:1.03; letter-spacing:-.023em; margin:14px 0 0; text-wrap:balance; }
+  .standfirst { margin:18px 0 0; font-size:19px; line-height:1.5; color:var(--muted); max-width:66ch; }
+  .clock { display:flex; flex-wrap:wrap; gap:0; margin-top:32px; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--surface); }
+  .clock > div { flex:1 1 175px; padding:14px 18px; border-right:1px solid var(--line-soft); }
+  .clock > div:last-child { border-right:0; }
+  .stat-n { display:block; font-size:23px; font-weight:700; letter-spacing:-.01em; font-variant-numeric:tabular-nums; margin-top:4px; }
+  .stat-n.is-crit { color:var(--crit); } .stat-n.is-warn { color:var(--warn); }
+  .stat-note { display:block; font-size:12.5px; color:var(--muted); margin-top:2px; }
+  nav.toc { display:flex; flex-wrap:wrap; gap:7px 18px; margin:24px 0 0; font-family:Archivo,sans-serif; font-size:13.5px; }
+  nav.toc a { color:var(--muted); text-decoration:none; } nav.toc a:hover { color:var(--accent); }
+  section { margin-top:60px; scroll-margin-top:20px; }
+  h2 { font-size:13px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--accent); margin:0 0 18px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+  h2 .n { color:var(--muted); margin-right:10px; font-weight:600; }
+  h3 { font-size:20px; font-weight:600; letter-spacing:-.012em; margin:30px 0 8px; text-wrap:balance; }
+  p { margin:0 0 15px; }
+  a { color:var(--accent); text-underline-offset:2px; }
+  a:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  code,.mono { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:.85em; }
+  code { background:var(--surface-2); padding:.1em .36em; border-radius:3px; }
+  .callout { background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:5px; padding:17px 21px; margin:20px 0; }
+  .callout.crit { border-left-color:var(--crit); } .callout.warn { border-left-color:var(--warn); }
+  .callout p:last-child { margin-bottom:0; }
+  .callout .lead { font-family:Archivo,sans-serif; font-weight:700; font-size:14.5px; letter-spacing:.01em; display:block; margin-bottom:7px; }
+  blockquote { margin:16px 0; padding:2px 0 2px 20px; border-left:2px solid var(--accent); color:var(--muted); font-size:15.5px; }
+  blockquote p:last-child { margin-bottom:0; }
+  figure { margin:28px 0 0; padding:0; }
+  .figbox { background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:22px 20px 12px; overflow-x:auto; }
+  .figbox svg { display:block; width:100%; height:auto; }
+  figcaption { margin-top:12px; font-size:14px; line-height:1.5; color:var(--muted); max-width:84ch; }
+  .steps { display:grid; gap:0; margin:22px 0 0; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--surface); }
+  .steps > div { display:grid; grid-template-columns:44px 1fr; border-bottom:1px solid var(--line-soft); }
+  .steps > div:last-child { border-bottom:0; }
+  .steps .k { font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--accent); padding:15px 0 15px 16px; }
+  .steps .b { padding:15px 18px 15px 6px; }
+  .step-t { font-weight:600; font-size:15.5px; }
+  .steps .b p { margin:5px 0 0; font-size:14.5px; color:var(--muted); }
+  .tablewrap { overflow-x:auto; border:1px solid var(--line); border-radius:6px; background:var(--surface); margin:22px 0 0; }
+  table { border-collapse:collapse; width:100%; font-size:14.5px; } table.wide { min-width:680px; }
+  th { text-align:left; font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:12px 15px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { padding:12px 15px; border-bottom:1px solid var(--line-soft); vertical-align:top; line-height:1.45; }
+  tr:last-child td { border-bottom:0; }
+  td.mono,th.mono { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:12.5px; }
+  .chip { display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; padding:3px 8px; border-radius:3px; white-space:nowrap; }
+  .chip.ok{background:var(--ok-bg);color:var(--ok);} .chip.warn{background:var(--warn-bg);color:var(--warn);}
+  .chip.crit{background:var(--crit-bg);color:var(--crit);} .chip.info{background:var(--accent-bg);color:var(--accent);}
+  ul.plain { margin:12px 0 0; padding-left:20px; } ul.plain li { margin-bottom:8px; }
+  .src { font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--muted); }
+  .src.block { display:block; margin-top:7px; }
+  footer.verif { margin-top:64px; padding-top:22px; border-top:1px solid var(--line); font-size:14.5px; color:var(--muted); }
+  @media (max-width:640px){ body{font-size:16px;} .wrap{padding:0 18px 56px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <span class="eyebrow">Incode · Session Restart · qué hacemos hoy y dónde nos pega</span>
+    <h1>Sesiones Incode en Bancrea</h1>
+    <p class="standfirst">El pingpong real de las sesiones en el sistema actual: cómo nacen, dónde se reusan, dónde se renuevan — y contra eso, qué de lo que hacemos entra en el corte que anuncia el correo de Incode.</p>
+
+    <div class="clock">
+      <div><span class="eyebrow">Corte duro (correo)</span><span class="stat-n is-crit">30 sep 2026</span><span class="stat-note">única fecha que tenemos</span></div>
+      <div><span class="eyebrow">Fuentes ancla</span><span class="stat-n">2</span><span class="stat-note">el correo + nuestro código</span></div>
+      <div><span class="eyebrow">Llamadas a <code>/omni/start</code></span><span class="stat-n">2</span><span class="stat-note">nacimiento y renovación</span></div>
+      <div><span class="eyebrow">La que pasa <code>interviewId</code></span><span class="stat-n is-crit">1</span><span class="stat-note">la renovación</span></div>
+    </div>
+
+    <nav class="toc" aria-label="Índice">
+      <a href="#pingpong">El pingpong</a>
+      <a href="#nace">Dónde nace</a>
+      <a href="#renueva">Reuso y renovación</a>
+      <a href="#dispara">Qué la dispara</a>
+      <a href="#app">Cómo la usa la app</a>
+      <a href="#corte">Dónde nos pega</a>
+      <a href="#nosabemos">Lo que no sabemos</a>
+      <a href="#anexo">Anexo: endpoints</a>
+    </nav>
+  </header>
+
+  <div class="col" style="margin-top:28px">
+    <div class="callout">
+      <span class="lead">Alcance de este documento</span>
+      <p>Todo lo que sigue describe <strong>lo que corre hoy</strong> (<code>develop</code> = <code>main</code>). Existe una rama <code>feat/deprecation-omni-start</code> que era una prueba de concepto: <strong>no está fusionada, no es referencia y aquí se ignora</strong>. Sobre la deprecación no hay documentación oficial ni nada publicado — la única fuente es el correo del 27-may-2026. Cuando algo no lo respalda ni el correo ni el código, se dice explícitamente en lugar de suponerlo.</p>
+    </div>
+  </div>
+
+  <!-- ============ 1. EL PINGPONG ============ -->
+  <section id="pingpong">
+    <h2><span class="n">01</span>El pingpong: dos <code>/omni/start</code>, propósitos opuestos</h2>
+    <div class="col">
+      <p>Toda la relación con Incode gira en torno a dos identificadores que Bancrea guarda en la solicitud: <code>kyc</code> (el <code>interviewId</code> = la sesión) e <code>incodeJWT</code> (el token de esa sesión). El backend tiene <strong>una sola llamada a <code>/omni/start</code> en el código, pero se usa de dos formas que hacen cosas opuestas</strong>, según se le pase o no un <code>interviewId</code>.</p>
+    </div>
+
+    <figure>
+      <div class="figbox">
+        <svg viewBox="0 0 1080 300" role="img" aria-label="Las dos formas de llamar /omni/start. startOnboarding pasa externalCustomerId sin interviewId y crea una sesión nueva: es el nacimiento. getInterviewToken pasa el interviewId de una sesión existente y renueva su token sin crear sesión nueva: es la renovación, y es la que pasa interviewId.">
+          <defs>
+            <marker id="mN" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0E6A72"/></marker>
+            <marker id="mR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#9E3129"/></marker>
+          </defs>
+
+          <!-- endpoint central -->
+          <rect x="440" y="118" width="200" height="64" rx="5" fill="none" stroke="currentColor" stroke-opacity=".55" stroke-width="1.6"/>
+          <text x="540" y="145" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500" fill="currentColor">POST /omni/start</text>
+          <text x="540" y="165" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".65">tenant de Incode</text>
+
+          <!-- nacimiento -->
+          <rect x="24" y="40" width="270" height="76" rx="5" fill="none" stroke="#0E6A72" stroke-width="1.7"/>
+          <text x="40" y="64" font-family="Archivo,sans-serif" font-size="13" font-weight="700" fill="#0E6A72">NACIMIENTO · startOnboarding(uuid)</text>
+          <text x="40" y="85" font-family="JetBrains Mono,monospace" font-size="10" fill="currentColor" opacity=".8">body: externalCustomerId, configId</text>
+          <text x="40" y="102" font-family="JetBrains Mono,monospace" font-size="10" fill="#0E6A72">SIN interviewId  →  crea sesión</text>
+          <path d="M294 82 C 370 90, 380 130, 436 140" fill="none" stroke="#0E6A72" stroke-width="1.7" marker-end="url(#mN)"/>
+
+          <!-- renovacion -->
+          <rect x="24" y="184" width="270" height="76" rx="5" fill="none" stroke="#9E3129" stroke-width="1.7"/>
+          <text x="40" y="208" font-family="Archivo,sans-serif" font-size="13" font-weight="700" fill="#9E3129">RENOVACIÓN · getInterviewToken(id)</text>
+          <text x="40" y="229" font-family="JetBrains Mono,monospace" font-size="10" fill="currentColor" opacity=".8">body: interviewId, configId</text>
+          <text x="40" y="246" font-family="JetBrains Mono,monospace" font-size="10" fill="#9E3129">CON interviewId  →  reusa sesión</text>
+          <path d="M294 218 C 370 210, 380 172, 436 160" fill="none" stroke="#9E3129" stroke-width="1.7" marker-end="url(#mR)"/>
+
+          <!-- salidas -->
+          <path d="M640 140 C 720 130, 740 82, 812 74" fill="none" stroke="#0E6A72" stroke-width="1.5" marker-end="url(#mN)"/>
+          <rect x="816" y="46" width="240" height="58" rx="5" fill="none" stroke="#0E6A72" stroke-width="1.5"/>
+          <text x="936" y="70" text-anchor="middle" font-family="Archivo,sans-serif" font-size="12.5" font-weight="600" fill="currentColor">interviewId + token NUEVOS</text>
+          <text x="936" y="89" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="currentColor" opacity=".7">→ mongo kyc, incodeJWT</text>
+
+          <path d="M640 160 C 720 172, 740 220, 812 226" fill="none" stroke="#9E3129" stroke-width="1.5" marker-end="url(#mR)"/>
+          <rect x="816" y="198" width="240" height="58" rx="5" fill="#F6E3E1" fill-opacity=".45" stroke="#9E3129" stroke-width="1.6"/>
+          <text x="936" y="222" text-anchor="middle" font-family="Archivo,sans-serif" font-size="12.5" font-weight="700" fill="#9E3129">token nuevo, MISMA sesión</text>
+          <text x="936" y="241" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".72">esto es lo que el correo corta</text>
+        </svg>
+      </div>
+      <figcaption><strong>Verde</strong> — <code>startOnboarding(uuid)</code> manda <code>externalCustomerId</code> sin <code>interviewId</code>: crea una sesión y guarda su <code>interviewId</code> en <code>kyc</code>. <strong>Rojo</strong> — <code>getInterviewToken(interviewId)</code> manda el <code>interviewId</code> de una sesión que ya existe: le saca un token nuevo sin abrir sesión nueva. Es literalmente <em>"reusar una sesión existente"</em> — el patrón que el correo dice que dejará de soportarse.<br><span class="src">develop · incode-fetcher.service.ts:58-66 (startOnboarding) · :149-155 (getInterviewToken)</span></figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 2. DONDE NACE ============ -->
+  <section id="nace">
+    <h2><span class="n">02</span>Dónde nace la sesión</h2>
+    <div class="col">
+      <p>La sesión se crea con <code>generateReportNumber → startOnboarding</code> (el verde). Nunca nace durante el enrolamiento del cliente: para cuando abre la app, su sesión ya existía. Estos son los puntos donde arranca:</p>
+    </div>
+
+    <div class="tablewrap">
+      <table class="wide">
+        <thead><tr><th>Dónde</th><th>Disparador</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Asignar promotor</strong> (solicitud importada)</td><td class="mono">createWithRFCFromSimulation → generateReportNumber</td><td>Solo si crea solicitud nueva y el provider es incode</td></tr>
+          <tr><td><strong>Renovación</strong> (<code>refinancing_renewal</code>)</td><td class="mono">createFromImportedRequest</td><td>Fuerza incode aunque el endpoint sea la variante nebuia</td></tr>
+          <tr><td><strong>Alta de usuario</strong> (admin)</td><td class="mono">createWithRFC</td><td>Una sesión por alta; <strong>una por fila</strong> en carga masiva</td></tr>
+          <tr><td><strong>Guardar simulación</strong></td><td class="mono">simulator/save/incode</td><td>Crea sesión al guardar</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src" style="margin-top:11px">develop · requests.service.ts:1235, 1308, 6800 · incode.service.ts:78-81</p>
+
+    <div class="col">
+      <p style="margin-top:18px">Al nacer se persisten en la solicitud: <code>kyc</code> = <code>interviewId</code>, <code>incodeJWT</code> = token, e <code>incodeJwtExpiresAt</code> = <strong>hoy + 89 días</strong> (cálculo local; el comentario del código dice 90 y suma 89). Ese número no viene de Incode.</p>
+    </div>
+  </section>
+
+  <!-- ============ 3. REUSO Y RENOVACION ============ -->
+  <section id="renueva">
+    <h2><span class="n">03</span>Dónde se reusa y dónde se renueva: <code>getToken</code></h2>
+    <div class="col">
+      <p>Después del nacimiento, nadie vuelve a crear la sesión: todo pasa por <code>getToken</code>, que <strong>nunca crea una sesión</strong> — si no hay <code>kyc</code>, revienta. Solo decide entre reusar el token guardado o renovarlo contra la misma sesión.</p>
+    </div>
+
+    <figure>
+      <div class="figbox">
+        <svg viewBox="0 0 1000 250" role="img" aria-label="Lógica de getToken. Si no hay kyc, lanza error. Si el token guardado existe y no expiró, lo reusa. Si falta o expiró, llama saveNewToken que hace getInterviewToken, la renovación con interviewId.">
+          <defs>
+            <marker id="tA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+            <marker id="tK" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2E6F4E"/></marker>
+            <marker id="tR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#9E3129"/></marker>
+          </defs>
+          <rect x="16" y="98" width="150" height="54" rx="4" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+          <text x="91" y="122" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="currentColor">getToken()</text>
+          <text x="91" y="139" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".65">report = request.kyc</text>
+          <line x1="166" y1="125" x2="198" y2="125" stroke="currentColor" stroke-opacity=".5" stroke-width="1.4" marker-end="url(#tA)"/>
+
+          <path d="M202 108 h150" fill="none" stroke="none"/>
+          <rect x="202" y="98" width="150" height="54" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/>
+          <text x="277" y="120" text-anchor="middle" font-family="Archivo,sans-serif" font-size="11.5" font-weight="600" fill="currentColor">¿hay kyc?</text>
+          <text x="277" y="138" text-anchor="middle" font-size="9" fill="currentColor" opacity=".6">y ¿token vigente?</text>
+
+          <!-- sin kyc -->
+          <path d="M277 152 V196" fill="none" stroke="currentColor" stroke-opacity=".55" stroke-width="1.4" marker-end="url(#tA)"/>
+          <text x="286" y="176" font-size="10" fill="currentColor" opacity=".7">no hay kyc</text>
+          <rect x="202" y="200" width="150" height="40" rx="4" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+          <text x="277" y="224" text-anchor="middle" font-family="Archivo,sans-serif" font-size="11" font-weight="600" fill="currentColor">throw (error)</text>
+
+          <!-- vigente -->
+          <path d="M352 112 h130" fill="none" stroke="#2E6F4E" stroke-width="1.5" marker-end="url(#tK)"/>
+          <text x="392" y="103" font-size="10" font-weight="600" fill="#2E6F4E" font-family="Archivo,sans-serif">vigente</text>
+          <rect x="486" y="86" width="200" height="52" rx="4" fill="none" stroke="#2E6F4E" stroke-width="1.5"/>
+          <text x="586" y="108" text-anchor="middle" font-family="Archivo,sans-serif" font-size="12" font-weight="600" fill="currentColor">Reusa incodeJWT</text>
+          <text x="586" y="126" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".68">sin tocar Incode</text>
+
+          <!-- vencido -->
+          <path d="M352 140 h130" fill="none" stroke="#9E3129" stroke-width="1.5" marker-end="url(#tR)"/>
+          <text x="392" y="160" font-size="10" font-weight="600" fill="#9E3129" font-family="Archivo,sans-serif">vencido / falta token</text>
+          <rect x="486" y="150" width="200" height="52" rx="4" fill="none" stroke="#9E3129" stroke-width="1.5"/>
+          <text x="586" y="172" text-anchor="middle" font-family="Archivo,sans-serif" font-size="12" font-weight="600" fill="currentColor">saveNewToken(uuid, report)</text>
+          <text x="586" y="190" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#9E3129">getInterviewToken(report)</text>
+          <line x1="686" y1="176" x2="720" y2="176" stroke="#9E3129" stroke-width="1.5" marker-end="url(#tR)"/>
+          <rect x="724" y="150" width="262" height="52" rx="4" fill="#F6E3E1" fill-opacity=".45" stroke="#9E3129" stroke-width="1.6"/>
+          <text x="855" y="172" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#9E3129">/omni/start CON interviewId</text>
+          <text x="855" y="190" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".72">renovación = Session Restart</text>
+        </svg>
+      </div>
+      <figcaption>La rama roja es el nudo: cuando el token de 89 días vence, la única forma que tiene Bancrea hoy de volver a operar la sesión es <code>getInterviewToken(report)</code> — <code>/omni/start</code> con el <code>interviewId</code>. No hay otra vía en el código. Renueva el token pero <strong>conserva la misma sesión</strong> (no toca <code>kyc</code>).<br><span class="src">develop · incode.service.ts:47-76 (getToken) · :32-44 (saveNewToken → getInterviewToken)</span></figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 4. QUE LA DISPARA ============ -->
+  <section id="dispara">
+    <h2><span class="n">04</span>Qué dispara la renovación</h2>
+    <div class="col">
+      <p><code>getToken</code> se invoca desde tres frentes. En cualquiera de ellos, si la sesión ya rebasó los 89 días, se dispara el <code>/omni/start</code> con <code>interviewId</code>. No es un caso de borde: es el camino normal de cualquier trámite que se retome semanas después.</p>
+    </div>
+
+    <div class="steps">
+      <div><div class="k">a</div><div class="b">
+        <span class="step-t">El cliente vuelve a la app</span>
+        <p>El token viaja al cliente como <code>incondeJwt</code> en la respuesta de verificación OTP (<code>otp/phone/verify</code>, <code>otp/email/verify</code>) y también en <code>requests/search</code> cuando la solicitud está <code>ACTIVE</code> y sin contraseña — este último <strong>sin validar OTP</strong>. Cada uno llama <code>getToken</code>. <span class="src block">requests.service.ts:1523, 1637, 1759</span></p>
+      </div></div>
+      <div><div class="k">b</div><div class="b">
+        <span class="step-t">El analista abre el expediente en el backoffice</span>
+        <p><code>kyc/data/nebuia</code> lee OCR y scores en vivo (<code>getKycData → /omni/get/ocr-data + /omni/get/score</code>), y primero pasa por <code>getToken</code>. Si el token venció, renueva antes de leer. <span class="src block">incode.service.ts:84-98</span></p>
+      </div></div>
+      <div><div class="k">c</div><div class="b">
+        <span class="step-t">La app adjunta documentos o la firma</span>
+        <p><code>kyc/append/documents/*</code> y la carátula responsiva bajan imágenes de Incode (<code>_saveIncodeImage → /omni/get/images</code>) a S3, pasando por <code>getToken</code>. La firma, en incode, se descarga de Incode — no se usa el trazo que sube el cliente. <span class="src block">incode.service.ts:153-180 · kyc-bridge.service.ts:418-433</span></p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- ============ 5. COMO LA USA LA APP ============ -->
+  <section id="app">
+    <h2><span class="n">05</span>Cómo la app consume la sesión</h2>
+    <div class="col">
+      <p>El backend solo entrega el token; <strong>el SDK habla directo con el tenant de Incode</strong> (<code>INCODE_API_URL</code>), sin api-key, con el token crudo. La app hace <code>init(apiUrl)</code> una vez, <code>setupOnboardingSession(OnboardingSessionConfiguration(token))</code> al recibir el <code>incondeJwt</code>, y luego encadena <strong>8 secciones sobre esa única sesión</strong>: anverso y reverso de INE, procesamiento, selfie/prueba de vida, face-match, validación gubernamental, comprobante de domicilio y firma. Entre ellas consulta <code>getUserScore</code> y <code>getUserOCRData</code>, y <strong>decide en el teléfono</strong> la validez de la INE, la prueba de vida y el face-match; el backend solo recibe el "adjuntar" cuando el paso ya pasó.</p>
+      <p class="src">kyc.controller.dart:52-53 (init), :79-80 (setupOnboardingSession), 8× startNewOnboardingSection :505-1253, getUserScore :647/857/1093, getUserOCRData :659</p>
+      <p>Consecuencia para las sesiones: la app no detecta ni renueva tokens. Si el token muere a mitad del flujo, aparece como error de sección del SDK; la renovación siempre ocurre del lado backend, en el próximo <code>getToken</code>.</p>
+    </div>
+  </section>
+
+  <!-- ============ 6. DONDE NOS PEGA ============ -->
+  <section id="corte">
+    <h2><span class="n">06</span>Dónde nos pega el corte</h2>
+    <div class="col">
+      <p>Anclado únicamente en el texto del correo y en el código de arriba. El correo dice, literal:</p>
+      <blockquote><p>“calls to the <code>/omni/start</code> endpoint that pass an <code>interviewId</code> or <code>externalId</code> will no longer be supported”.</p></blockquote>
+    </div>
+
+    <div class="callout crit">
+      <span class="lead">Impacto directo y seguro</span>
+      <p>La <strong>renovación de token</strong> (<code>getInterviewToken(report)</code>) es exactamente eso: <code>/omni/start</code> con <code>interviewId</code>. Cuando esa llamada deje de soportarse, <strong>toda sesión cuyo token de 89 días haya vencido queda sin forma de operarse</strong> con el código actual — no hay otra vía de renovación. Se cae por igual el cliente que retoma el trámite, la lectura del analista y el adjunto de imágenes/firma.</p>
+    </div>
+
+    <div class="col">
+      <p>Lo que se arrastra detrás de esa única llamada:</p>
+      <ul class="plain">
+        <li><strong>Leer datos de sesiones existentes</strong> (scores, OCR, imágenes) tras vencer el token — el correo lo lista como el primer patrón afectado (<em>"Fetching a new access token to retrieve session data"</em>). Es el backoffice y el append.</li>
+        <li><strong>La firma en incode</strong>, porque se descarga con <code>/omni/get/images</code> pasando por <code>getToken</code> — cae bajo el patrón de acciones post-onboarding que el correo también menciona.</li>
+        <li><strong>Los <code>/omni/start</code> repetidos desde el backend</strong> — el correo los lista aparte; ocurren cada vez que un mismo cliente genera más de una sesión (varias altas, renovaciones).</li>
+      </ul>
+    </div>
+
+    <div class="callout warn">
+      <span class="lead">Zona gris que hay que preguntarle a Incode</span>
+      <p>El nacimiento (<code>startOnboarding</code>) manda <code>externalCustomerId</code>, <strong>no</strong> <code>externalId</code>. El correo prohíbe <em>"interviewId or externalId"</em> — no nombra <code>externalCustomerId</code>. Si son campos distintos para Incode, el nacimiento no está afectado; si los trata igual, sí. <strong>No tenemos con qué resolverlo desde el código</strong>: es pregunta directa para ellos.</p>
+    </div>
+
+    <div class="col">
+      <p style="margin-top:18px">Sobre <strong>cómo será la migración</strong>: no lo sé, y no hay con qué afirmarlo. El correo solo dice que Incode trabaja en <em>"alternative authentication methods (such as admin tokens)"</em> para los endpoints session-scoped, y que el CSM/SE de cuenta guiará caso por caso. No hay documentación, endpoints ni fechas de ese modelo publicadas. Lo que sí podemos llevar cerrado a la junta es <strong>el mapa de arriba</strong>: cada punto donde hoy dependemos de renovar o reusar una sesión, que es exactamente lo que tendrán que cubrir esas "alternative auth methods".</p>
+    </div>
+  </section>
+
+  <!-- ============ 7. LO QUE NO SABEMOS ============ -->
+  <section id="nosabemos">
+    <h2><span class="n">07</span>Lo que no sabemos (y no vamos a inventar)</h2>
+    <div class="col">
+      <ul class="plain">
+        <li><strong>El TTL real del token.</strong> Usamos 89 días por decisión propia; Incode no publica cifra. Si el real es menor, hay tokens que creemos vivos y están muertos, y la renovación se dispara antes.</li>
+        <li><strong>Si <code>externalCustomerId</code> entra en el corte.</strong> Solo Incode puede confirmarlo.</li>
+        <li><strong>Cómo será el modelo sucesor.</strong> El correo nombra "admin tokens" sin más; no hay endpoints, alcance ni fechas públicas.</li>
+        <li><strong>Qué pasa con imágenes/firmas de sesiones cuyo token venza antes de haberlas cacheado</strong> tras el corte, y por cuánto tiempo se podrán leer datos de sesiones viejas.</li>
+      </ul>
+      <p style="margin-top:16px"><span class="eyebrow" style="display:block;margin-bottom:6px">Al margen de la deprecación</span>Durante el mapeo salieron hallazgos de seguridad no relacionados con el corte —la <code>x-api-key</code> y respuestas con PII quedan en los logs, y los endpoints <code>kyc/*</code> resuelven por <code>request_id</code> sin validar propiedad— que se reportan aparte para no mezclarlos con esta conversación. <span class="src">incode-fetcher.service.ts:177,190-198 · kyc.controller.ts (JwtAuthGuard sin check de dueño)</span></p>
+    </div>
+  </section>
+
+  <!-- ============ 8. ANEXO ============ -->
+  <section id="anexo">
+    <h2><span class="n">08</span>Anexo · referencia de endpoints y métodos Incode</h2>
+    <div class="col">
+      <p>Insumos para consulta rápida en la junta. Todo verificado contra <code>develop</code> (backend) y el código de la app. La <strong>columna que importa para la deprecación</strong> es "toca Incode": marca qué llamada sale realmente al tenant y por tanto depende de una sesión.</p>
+    </div>
+
+    <h3>A · El backend llama al tenant de Incode</h3>
+    <p class="col" style="font-size:15px">Todas salen de <code>IncodeFetcherService</code>, con headers <code>x-api-key</code> + <code>api-version: 1.0</code>, y el token de sesión en <code>X-Incode-Hardware-Id</code>. Son los cinco únicos <code>/omni/*</code> que toca el código.</p>
+    <div class="tablewrap">
+      <table class="wide">
+        <thead><tr><th>Método interno</th><th class="mono">Path Incode</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">startOnboarding(uuid)</td><td class="mono">POST /omni/start</td><td>Crea sesión nueva (manda <code>externalCustomerId</code>, sin <code>interviewId</code>). <strong>Nacimiento.</strong></td></tr>
+          <tr><td class="mono">getInterviewToken(id)</td><td class="mono">POST /omni/start</td><td>Renueva el token de una sesión existente (manda <code>interviewId</code>). <strong>Renovación = el patrón que se corta.</strong></td></tr>
+          <tr><td class="mono">fetchOcrData(id, tok)</td><td class="mono">GET /omni/get/ocr-data</td><td>Trae el OCR de la sesión (datos extraídos de la INE).</td></tr>
+          <tr><td class="mono">fetchScores(id, tok)</td><td class="mono">GET /omni/get/score</td><td>Trae los scores de validación (INE, liveness, face-match…).</td></tr>
+          <tr><td class="mono">fetchImagesB64(id, tok)</td><td class="mono">POST /omni/get/images</td><td>Descarga en base64 una imagen de la sesión (INE, rostro, comprobante, firma).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src" style="margin-top:9px">develop · incode-fetcher.service.ts:58, 149, 77, 130, 95</p>
+
+    <h3>B · Endpoints que el backend expone (relacionados con Incode/KYC)</h3>
+    <p class="col" style="font-size:15px">Prefijo <code>kyc/</code> salvo los colaterales al final. Todos con <code>JwtAuthGuard</code>. "Toca Incode" = si la llamada sale al tenant en vivo o solo lee caché S3 / Mongo.</p>
+    <div class="tablewrap">
+      <table class="wide">
+        <thead><tr><th>Endpoint</th><th>Qué hace</th><th>Toca Incode</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">GET data/nebuia</td><td>Devuelve OCR + scores para el backoffice (nombre "nebuia" pero para incode trae datos de Incode)</td><td><span class="chip crit">get/ocr-data + score</span></td></tr>
+          <tr><td class="mono">GET append/documents/id</td><td>Registra anverso/reverso de INE en el expediente</td><td><span class="chip crit">get/images</span></td></tr>
+          <tr><td class="mono">GET append/documents/face</td><td>Registra la selfie / rostro</td><td><span class="chip crit">get/images</span></td></tr>
+          <tr><td class="mono">GET append/documents/address</td><td>Registra el comprobante de domicilio y guarda la dirección</td><td><span class="chip crit">get/images</span></td></tr>
+          <tr><td class="mono">POST generate/responsive_card/b64</td><td>Genera la carátula responsiva; en incode baja la firma de Incode e ignora el trazo del cliente</td><td><span class="chip crit">get/images (firma)</span></td></tr>
+          <tr><td class="mono">GET generate/code/nebuia</td><td>Devuelve <code>000000</code> fijo (legado nebuia)</td><td><span class="chip ok">no</span></td></tr>
+          <tr><td class="mono">GET incode/address</td><td>Lee la dirección ya guardada (<code>incodeAdress</code> / <code>incodeAdressFromId</code>)</td><td><span class="chip ok">solo Mongo</span></td></tr>
+          <tr><td class="mono">GET preview/image · document · video · xml</td><td>Previsualiza / descarga documentos ya cacheados</td><td><span class="chip ok">caché S3</span></td></tr>
+          <tr><td class="mono">GET exist/document/:doc</td><td>Comprueba si un documento existe</td><td><span class="chip ok">caché S3</span></td></tr>
+          <tr><td class="mono">POST save/extra/:doc · save/video/evidence</td><td>Sube documento extra / video de consentimiento a S3</td><td><span class="chip ok">no</span></td></tr>
+          <tr><td class="mono">POST validate/passport</td><td>No-op: ignora el archivo y responde OK (legado)</td><td><span class="chip ok">no</span></td></tr>
+          <tr><td class="mono">POST validate/save/fingerprints</td><td>En incode lanza <code>IncodeNotImplemented</code></td><td><span class="chip info">no impl.</span></td></tr>
+          <tr><td class="mono">POST requests/set/kyc/address/incode</td><td>Colateral: guarda la dirección elegida en Mongo</td><td><span class="chip ok">solo Mongo</span></td></tr>
+          <tr><td class="mono">GET requests/filter/colonies/incode</td><td>Colateral: filtra colonias por CP (dato local)</td><td><span class="chip ok">no</span></td></tr>
+          <tr><td class="mono">POST simulator/save/incode</td><td>Colateral: guarda simulación con provider incode → <strong>crea sesión</strong></td><td><span class="chip warn">/omni/start (nace)</span></td></tr>
+          <tr><td class="mono">POST users/add/incode · massive/add/incode</td><td>Colateral (admin): alta de usuario(s) → <strong>una sesión por alta / por fila</strong></td><td><span class="chip warn">/omni/start (nace)</span></td></tr>
+          <tr><td class="mono">POST imported-requests/promotor/assignment/{individual,massive}/incode</td><td>Colateral (admin): asigna promotor → <strong>crea sesión</strong> si genera solicitud nueva</td><td><span class="chip warn">/omni/start (nace)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src" style="margin-top:9px">develop · kyc.controller.ts:46-648 · requests.controller.ts:197,1170 · simulations.controller.ts:63 · users.controller.ts:110,265 · imported-requests.controller.ts:165,186</p>
+
+    <h3>C · La app llama al SDK nativo de Incode</h3>
+    <p class="col" style="font-size:15px">El SDK habla directo al tenant (<code>INCODE_API_URL</code>), sin api-key, con el token crudo. El backend no interviene en estas llamadas.</p>
+    <div class="tablewrap">
+      <table class="wide">
+        <thead><tr><th>Método del SDK</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">init(apiUrl, testMode)</td><td>Inicializa el SDK contra el tenant. Sin api-key.</td></tr>
+          <tr><td class="mono">setLocalizationLanguage · showCloseButton</td><td>Idioma (es) y botón de cancelar del flujo.</td></tr>
+          <tr><td class="mono">setupOnboardingSession(config(token))</td><td>Ata el SDK a la sesión con el <code>incondeJwt</code> recibido del backend.</td></tr>
+          <tr><td class="mono">startNewOnboardingSection(flowConfig) ×8</td><td>Lanza cada sección de captura sobre la misma sesión.</td></tr>
+          <tr><td class="mono">getUserScore() ×3</td><td>Lee scores en el teléfono (procesamiento INE, face-match, validación).</td></tr>
+          <tr><td class="mono">getUserOCRData()</td><td>Lee los ~40 campos de OCR en el teléfono.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="col" style="font-size:14.5px;margin-top:12px">Los 8 <code>flowConfig</code> de las secciones (en orden): <code>addIdScan</code> (anverso), <code>addIdScan</code> (reverso), <code>addProcessId</code>, <code>addSelfieScan</code>, <code>addFaceMatch</code>, <code>addGovernmentValidation</code>, <code>addDocumentScan</code> (domicilio), <code>addSignature</code>.</p>
+    <p class="src">kyc.controller.dart:52, 61-62, 79, 505-1253, 647/857/1093, 659</p>
+
+    <h3>D · La app llama al backend (clientes KYC)</h3>
+    <p class="col" style="font-size:15px">URL = <code>${Env.base}/kyc/</code> + sufijo (más colaterales en otros clientes). El backend traduce a las llamadas Incode de la tabla A/B.</p>
+    <div class="tablewrap">
+      <table class="wide">
+        <thead><tr><th>Factory (app)</th><th class="mono">Método → endpoint</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">registerDocument(doc)</td><td class="mono">GET append/documents/{doc}</td><td>Pide adjuntar INE / rostro / domicilio al expediente</td></tr>
+          <tr><td class="mono">getAddressExtractedFromId</td><td class="mono">GET incode/address</td><td>Lee la dirección extraída de la INE</td></tr>
+          <tr><td class="mono">signResponsiveCard(firma)</td><td class="mono">POST generate/responsive_card/b64</td><td>Genera la carátula responsiva firmada</td></tr>
+          <tr><td class="mono">previewResponsiveCard</td><td class="mono">GET preview/responsive_card/b64</td><td>Previsualiza la carátula</td></tr>
+          <tr><td class="mono">previewImage / previewDocument</td><td class="mono">GET preview/b64/{image,document}/{item}</td><td>Muestra documentos ya capturados</td></tr>
+          <tr><td class="mono">existDocument(item)</td><td class="mono">GET exist/document/{item}</td><td>Verifica si un documento ya existe</td></tr>
+          <tr><td class="mono">saveExtraDocument · saveVideoEvidence</td><td class="mono">POST save/extra/{doc} · save/video/evidence</td><td>Sube documento extra / video de consentimiento</td></tr>
+          <tr><td class="mono">validatePassport · validate/saveFingerprints</td><td class="mono">POST validate/passport · {validate,save}/fingerprints</td><td>Legado; en incode no operan (no-op / not-implemented)</td></tr>
+          <tr><td class="mono">getNebuIAData</td><td class="mono">GET data/nebuia</td><td>Definido en el cliente; sin call site vivo en la app</td></tr>
+          <tr><td class="mono">(RequestsApiClient) setAddress</td><td class="mono">POST requests/set/kyc/address/incode</td><td>Guarda la dirección confirmada</td></tr>
+          <tr><td class="mono">(RequestsApiClient) getColonies</td><td class="mono">GET requests/filter/colonies/incode</td><td>Filtra colonias por CP</td></tr>
+          <tr><td class="mono">(SimulatorApiClient) add</td><td class="mono">POST simulator/save/incode</td><td>Guarda simulación (dispara nacimiento de sesión)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src" style="margin-top:9px">kyc_api_client.dart:18-160 · requests_api_client.dart:361,404 · simulator_api_client.dart:109</p>
+  </section>
+
+  <footer class="verif">
+    <p>Todo lo citado como <span class="src">archivo:línea</span> proviene de lectura directa de la rama <code>develop</code> (idéntica a <code>main</code> en el módulo Incode) del backend, más el código de la app Flutter. La única fuente sobre la deprecación es el correo de Incode del 27-may-2026; no se usó documentación pública porque, para esta deprecación, no la hay. La rama <code>feat/deprecation-omni-start</code> se excluyó por ser prueba de concepto sin fusionar.</p>
+  </footer>
+
+</div>
+</body>
+</html>
